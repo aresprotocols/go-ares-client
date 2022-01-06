@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/vedhavyas/go-subkey"
+	"github.com/vedhavyas/go-subkey/ed25519"
 	"github.com/vedhavyas/go-subkey/sr25519"
 	"polkadot/ares/account/encode"
 	"testing"
@@ -120,6 +121,51 @@ func TestDevAccount(t *testing.T) {
 		gotSS58Addr, err := s.SS58Address(network)
 		fmt.Println("gotSS58Addr", gotSS58Addr)
 	}
+}
+
+func TestAresAccount(t *testing.T) {
+	uris := []string{
+		"blur pioneer frown science banana impose avoid law act strategy have bronze//1",
+		"blur pioneer frown science banana impose avoid law act strategy have bronze//2",
+		"blur pioneer frown science banana impose avoid law act strategy have bronze//3",
+		"blur pioneer frown science banana impose avoid law act strategy have bronze//4",
+	}
+	network := uint8(34)
+
+	for i, uri := range uris {
+		SrAddress(uri+"//stash", network)
+		if i > 2 {
+			SrAddress(uri+"//babe", network)
+		} else {
+			SrAddress(uri+"//aura", network)
+		}
+		//EdAddress(uri+"//ares", network)
+	}
+}
+
+func SrAddress(uri string, network uint8) {
+	s, err := subkey.DeriveKeyPair(sr25519.Scheme{}, uri)
+	if err != nil {
+		return
+	}
+	seed := subkey.EncodeHex(s.Seed())
+	gotSS58Addr, err := s.SS58Address(network)
+	fmt.Println("seed", seed, "gotSS58Addr", gotSS58Addr, "account", subkey.EncodeHex(s.AccountID()))
+}
+
+func EdAddress(uri string, network uint8) {
+	s, err := subkey.DeriveKeyPair(ed25519.Scheme{}, uri)
+	if err != nil {
+		return
+	}
+	seed := subkey.EncodeHex(s.Seed())
+	fmt.Println("seed", seed, " seed len", len(s.Seed()))
+	pub := s.Public()
+	fmt.Println("pub", subkey.EncodeHex(pub), " uri ", uri)
+	fmt.Println("accountID", subkey.EncodeHex(s.AccountID()))
+
+	gotSS58Addr, err := s.SS58Address(network)
+	fmt.Println("gotSS58Addr", gotSS58Addr)
 }
 
 //var TestKeyringPairAlice = KeyringPair{

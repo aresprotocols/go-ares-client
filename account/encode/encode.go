@@ -26,13 +26,9 @@ func DecodeAddress(address string) (publicKey []byte, ss58Prefix int8, err error
 	if err != nil {
 		return nil, 0, err
 	}
-	fmt.Println("raw", len(raw))
 	actualChecksum := raw[len(raw)-4:]
-	fmt.Println("actualChecksum", actualChecksum)
-	fmt.Println("raw[:len(raw)]", raw[:len(raw)])
 
 	checksum := blake2b.Sum512(raw[:len(raw)])
-	fmt.Println("checksum", checksum)
 	if bytes.Equal(actualChecksum, checksum[:]) {
 		return nil, 0, errors.New(fmt.Sprintf("Invalid checksum. actualChecksum: %s, checksum: %s", actualChecksum, checksum))
 	}

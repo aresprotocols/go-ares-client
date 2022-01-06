@@ -52,7 +52,31 @@ func TestSession(t *testing.T) {
 		}
 		previous := accountInfo.Data.Free
 		fmt.Printf("\tValidator %v: %#x  %s  %v %d \n", i, v, address, previous.Int, toAres(previous.Int).Int64())
+
+		//_, err := CreateStorageKey(m, "Staking", "ErasStakers")
+		//key, err := CreateStorageKey(m, "Session", "NextKeys",
 	}
+}
+
+func TestSessionIndex(t *testing.T) {
+	api, err := gsrpc.NewSubstrateAPI("wss://gladios.aresprotocol.io")
+	if err != nil {
+		panic(err)
+	}
+
+	meta, err := api.RPC.State.GetMetadataLatest()
+	if err != nil {
+		panic(err)
+	}
+
+	key, err := types.CreateStorageKey(meta, "Session", "CurrentIndex", nil)
+	var index types.U32
+	ok, err := api.RPC.State.GetStorageLatest(key, &index)
+	if err != nil || !ok {
+		fmt.Println("err ", err)
+		panic(err)
+	}
+	fmt.Println("sessionIndex ", index)
 }
 
 func toAres(val *big.Int) *big.Int {
